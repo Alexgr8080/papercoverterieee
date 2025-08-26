@@ -1,0 +1,34 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{microtype}
+\begin{document}
+\title{ {{ title | replace('#','\#') }} }
+\author{
+{%- for block in author_blocks %}
+\IEEEauthorblockN{ {{ block.name | replace('#','\#') }} }
+\IEEEauthorblockA{ {{ block.affiliation | replace('#','\#') }}\\
+\textit{ {{ block.organization | default('') | replace('#','\#') }} }\\
+{{ block.city_country | default('') | replace('#','\#') }}\\
+{{ block.email_or_orcid | default('') | replace('#','\#') }}
+}
+{%- if not loop.last %}\and{% endif %}
+{%- endfor %}
+}
+\maketitle
+\begin{abstract}
+{{ abstract | replace('#','\#') }}
+\end{abstract}
+\begin{IEEEkeywords}
+{{ keywords | join(', ') }}
+\end{IEEEkeywords}
+{{ body_latex }}
+\bibliographystyle{IEEEtran}
+\bibliography{{ bibfile_base }}
+\end{document}
