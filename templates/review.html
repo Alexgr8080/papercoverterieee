@@ -1,0 +1,83 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Review & Generate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head><body class="min-h-screen bg-gray-50">
+<div class="max-w-4xl mx-auto py-10 px-4">
+<h1 class="text-2xl font-bold mb-4">Review & Generate IEEE LaTeX</h1>
+<form action="/generate/{{ uid }}" method="post" class="bg-white rounded-xl shadow p-6 space-y-6">
+  <div><label class="block text-sm font-medium mb-1">Title</label>
+  <input type="text" name="title" value="{{ guessed_title }}" class="w-full border rounded p-2" required/></div>
+  <div><label class="block text-sm font-medium mb-1">Abstract</label>
+  <textarea name="abstract" rows="6" class="w-full border rounded p-2">{{ guessed_abstract }}</textarea></div>
+  <div><label class="block text-sm font-medium mb-1">Keywords (comma/semicolon)</label>
+  <input type="text" name="keywords" value="{{ guessed_keywords }}" class="w-full border rounded p-2"/></div>
+  <div>
+    <h2 class="text-lg font-semibold mb-2">Authors</h2>
+    <p class="text-xs text-gray-500 mb-3">Edit extracted authors/affiliations below.</p>
+    <div id="authors" class="space-y-3">
+      {% for i, a in enumerate(authors) %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border rounded p-3">
+        <input type="hidden" name="author_rows" id="author_rows" value="{{ authors|length }}"/>
+        <div><label class="block text-xs font-medium">Name</label>
+          <input name="author_{{ i }}_name" class="w-full border rounded p-2" value="{{ a.name }}"/></div>
+        <div><label class="block text-xs font-medium">Affiliation</label>
+          <input name="author_{{ i }}_affiliation" class="w-full border rounded p-2" value="{{ a.affiliation }}"/></div>
+        <div><label class="block text-xs font-medium">Organization</label>
+          <input name="author_{{ i }}_organization" class="w-full border rounded p-2" value="{{ a.organization }}"/></div>
+        <div><label class="block text-xs font-medium">City, Country</label>
+          <input name="author_{{ i }}_city_country" class="w-full border rounded p-2" value="{{ a.city_country }}"/></div>
+        <div class="md:col-span-2"><label class="block text-xs font-medium">Email or ORCID</label>
+          <input name="author_{{ i }}_email" class="w-full border rounded p-2" value="{{ a.email_or_orcid }}"/></div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="flex gap-2 mt-2">
+      <button type="button" onclick="addAuthor()" class="px-3 py-1 rounded border">+ Add Author</button>
+      <button type="button" onclick="removeAuthor()" class="px-3 py-1 rounded border">− Remove Last</button>
+    </div>
+  </div>
+  <div class="flex items-center gap-2">
+    <input id="compile_pdf" type="checkbox" name="compile_pdf" class="h-4 w-4 border rounded"/>
+    <label for="compile_pdf" class="text-sm">Compile PDF on server (needs LaTeX + latexmk)</label>
+  </div>
+  <div><button class="px-4 py-2 rounded bg-black text-white">Generate LaTeX & ZIP</button></div>
+</form>
+<div class="mt-10">
+  <h3 class="font-semibold mb-2">Body LaTeX Preview (truncated)</h3>
+  <pre class="bg-gray-100 p-3 rounded text-xs overflow-auto" style="max-height: 300px;">{{ body_preview }}</pre>
+</div>
+</div>
+<script>
+function addAuthor() {
+  const container = document.getElementById('authors');
+  const countInput = document.getElementById('author_rows');
+  let n = parseInt(countInput.value || '0');
+  const tpl = `
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border rounded p-3">
+    <input type="hidden" name="author_rows" id="author_rows" value="${n+1}"/>
+    <div><label class="block text-xs font-medium">Name</label>
+      <input name="author_${n}_name" class="w-full border rounded p-2" value=""/></div>
+    <div><label class="block text-xs font-medium">Affiliation</label>
+      <input name="author_${n}_affiliation" class="w-full border rounded p-2" value=""/></div>
+    <div><label class="block text-xs font-medium">Organization</label>
+      <input name="author_${n}_organization" class="w-full border rounded p-2" value=""/></div>
+    <div><label class="block text-xs font-medium">City, Country</label>
+      <input name="author_${n}_city_country" class="w-full border rounded p-2" value=""/></div>
+    <div class="md:col-span-2"><label class="block text-xs font-medium">Email or ORCID</label>
+      <input name="author_${n}_email" class="w-full border rounded p-2" value=""/></div>
+  </div>`;
+  container.insertAdjacentHTML('beforeend', tpl);
+  countInput.value = String(n+1);
+}
+function removeAuthor() {
+  const container = document.getElementById('authors');
+  const blocks = container.querySelectorAll('.grid');
+  if (blocks.length > 0) {
+    container.removeChild(blocks[blocks.length-1]);
+    const countInput = document.getElementById('author_rows');
+    countInput.value = String(Math.max(1, parseInt(countInput.value||'1')-1));
+  }
+}
+</script>
+</body></html>

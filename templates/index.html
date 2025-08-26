@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DOCX → IEEE (LaTeX) Converter</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head><body class="min-h-screen bg-gray-50">
+<div class="max-w-3xl mx-auto py-10 px-4">
+<h1 class="text-3xl font-bold mb-2">DOCX → IEEE (LaTeX) Converter</h1>
+<p class="text-gray-600 mb-6">Upload a <b>.docx</b>, review metadata, then generate LaTeX (IEEEtran).</p>
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+  <div class="space-y-2 mb-4">{% for cat,msg in messages %}
+    <div class="p-3 rounded border {{ 'border-red-300 bg-red-50' if cat=='error' else 'border-amber-300 bg-amber-50' }}">
+      <p class="text-sm">{{ msg }}</p></div>{% endfor %}
+  </div>{% endif %}{% endwith %}
+<form action="/upload" method="post" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-6 space-y-4">
+  <div><label class="block text-sm font-medium mb-2">Choose .docx file</label>
+  <input type="file" name="docx" accept=".docx" class="block w-full border rounded p-2" required/></div>
+  <div class="text-sm text-gray-600"><p><b>Requires:</b> Pandoc. Optional: LaTeX + latexmk for PDF compile.</p></div>
+  <button class="px-4 py-2 rounded bg-black text-white">Upload & Extract</button>
+</form>
+</div></body></html>
